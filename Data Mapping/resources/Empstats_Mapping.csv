@@ -1,0 +1,24 @@
+empstats,empstats_label
+,Undefined
+0,Undefined
+I,Undefined
+J,Undefined
+N,Undefined
+O,Undefined
+X,Undefined
+2,Short term disability
+3,Long term disability
+4,Terminated
+5,Layoff
+6,Leave of absence
+7,Retired
+8,Surviving spouse
+9,"Outside, not current"
+A,Active
+D,Deceased
+L,Leave of absence
+P,Leave of absence with pay
+Q,Retired with pay
+R,Retired
+S,Suspended
+T,Terminated

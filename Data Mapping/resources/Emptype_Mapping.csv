@@ -1,0 +1,4 @@
+emptype,emptype_label
+H,Hourly
+E,Exception Hourly
+S,Salaried
