@@ -6,7 +6,7 @@ This repository houses the source code and documentation of the HR-CDM Data Tran
 
 The image below illustrates the 3 steps to perform the data transformation: 1) Data Harmonization, 2) Data Mapping, and 3) Data Loading
 
-!["HR-CDM Tranformation Pipeline: Data Harmonization -> Data Mapping -> Data Loading"](_internal/data-transformation-pipeline.png)
+!["HR-CDM Transformation Pipeline: Data Harmonization -> Data Mapping -> Data Loading"](https://github.com/AmericanManufacturingCohort/HR-CDM-Data-Transformation/wiki/_Images/data-transformation-pipeline.png)
 
 **Step 1: Data Harmonization**
 
