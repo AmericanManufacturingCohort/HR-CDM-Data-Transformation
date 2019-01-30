@@ -94,7 +94,7 @@ action_recode <- function(empstats, action, reasoncd, retirement_eligibility) {
         work_state = "FMLA"
       } else if (action == "Layoff Legacy" || action == "Suspended Disciplinary" || action == "Layoff Separation") {
         work_state = "Suspend"
-      } else if (action == "Terminated" || action == "Layoff Plant Shut Down Union" || action == "Only Use SBE" || action == "Layoff Union Use Only SBE"
+      } else if (action == "Terminated" || action == "Layoff Plant Shut Down Union Only Use SBE" || action == "Layoff Union Use Only SBE"
                  || action == "Layoff Special ISP" || action == "Layoff SBE" || action == "Layoff Plant Shut Down no SBE" || action  == "Layoff Plant Shut Down SBE"
                  || action == "Layoff Department Shut Down" || action == "Layoff Benefit Expired" || action == "Layoff No SBE") {
         if (!is.na(retirement_eligibility)) {
