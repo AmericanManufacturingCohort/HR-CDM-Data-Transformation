@@ -15,7 +15,7 @@ create_hrcdm_tables <- function(combined_dataset_filepath, retirement_eligibilit
   combined_dataset <- load_combined_dataset(combined_dataset_filepath)
   retire_eligibility <- load_retirement_eligibility_data(retirement_eligibility_dataset_filepath)
 
-  message("Adding retirement eligibility info to the raw data")
+  message("Merging retirement eligibility data and combined data")
   combined_dataset <- combined_dataset %>% left_join(retire_eligibility, by="eessno")
   combined_dataset$retirement_eligibility_flag[is.na(combined_dataset$retirement_eligibility_flag)]<-0  # Assume NA == 0
 
@@ -91,8 +91,6 @@ load_combined_dataset <- function(filepath) {
         'character')) # source
   message("... sorting data")
   combined_dataset <- combined_dataset %>% arrange(eessno,effdtdt)
-  message("... generating base id, starting from 10000001")
-  combined_dataset$base_id<-10000000+seq.int(from=1, to=nrow(combined_dataset))
   message("... reading ", nrow(combined_dataset) , " rows in ", length(names(combined_dataset)), " variables")
   return (combined_dataset)
 }

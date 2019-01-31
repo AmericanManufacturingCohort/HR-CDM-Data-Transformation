@@ -107,7 +107,7 @@ create_employment_record_monthly_grid <- function(employment_record) {
   message("... collecting ", formatC(dataset_size, format="d", big.mark=","), " rows in ", length(names(employment_record_monthly_grid)), " variables")
 
   message("... testing data size")
-  expected_size = 41629310
+  expected_size = 41609407
   if (dataset_size == expected_size) {
     message("... test PASSED - the resulting data size meets the expected number")
   } else {

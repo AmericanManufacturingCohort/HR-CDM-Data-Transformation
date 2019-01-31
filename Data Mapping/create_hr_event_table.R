@@ -5,8 +5,19 @@ create_hr_event_table <- function(combined_dataset, person) {
   if (!("lubridate" %in% (.packages()))) {
     library(lubridate)    
   }
-    
+ 
   message("Creating HR_EVENT table")
+  message("... slicing source data")
+  combined_dataset<-combined_dataset %>%
+      select(eessno, effdtdt, jobtitle, jobcode, empstats,
+             emptype, buname, bucode, deptname, deptcode,
+             locatcd, annual, action, actioncd, actionde,
+             reasoncd, retirement_eligibility_flag)
+  message("... removing duplicates")
+  combined_dataset<-unique(combined_dataset)
+  message("... generating HR_EVENT primary key")
+  combined_dataset$base_id<-10000000+seq.int(from=1, to=nrow(combined_dataset)) 
+
   message("... extracting data")
   employee_id_mapping <- person %>% distinct(person_source_value, person_id) %>% select(person_source_value, person_id)
   hr_event<-combined_dataset %>%
@@ -39,7 +50,7 @@ create_hr_event_table <- function(combined_dataset, person) {
   message("... collecting ", formatC(dataset_size, format="d", big.mark=","), " rows in ", length(names(hr_event)), " variables")
 
   message("... testing data size")
-  expected_size = 3052017
+  expected_size = 3032114
   if (dataset_size == expected_size) {
     message("... test PASSED - the resulting data size meets the expected number")
   } else {

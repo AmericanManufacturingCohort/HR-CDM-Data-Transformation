@@ -1,4 +1,4 @@
-create_employment_record_table <- function(raw_data, person) {
+create_employment_record_table <- function(combined_dataset, person) {
   if (!("dplyr" %in% (.packages()))) {
     library(dplyr)    
   }
@@ -7,8 +7,19 @@ create_employment_record_table <- function(raw_data, person) {
   }
 
   source("action_recode.R")
-  
+
   message("Creating EMPLOYMENT_RECORD table")
+  message("... slicing source data")
+  combined_dataset<-combined_dataset %>%
+      select(eessno, effdtdt, jobtitle, jobcode, empstats,
+             emptype, buname, bucode, deptname, deptcode,
+             locatcd, annual, action, actioncd, actionde,
+             reasoncd, retirement_eligibility_flag)
+  message("... removing duplicates")
+  combined_dataset<-unique(combined_dataset)
+  message("... generating HR_EVENT foreign key")
+  combined_dataset$base_id<-10000000+seq.int(from=1, to=nrow(combined_dataset))    
+
   message("... loading empstats mapping")
   empstats_mapping<-read.csv('resources/Empstats_Mapping.csv',
       header=T, na.strings=c(""," ","NA"),
@@ -40,14 +51,14 @@ create_employment_record_table <- function(raw_data, person) {
 
   message("... augmenting the raw data with the data mappings")
   employee_id_mapping <- person %>% distinct(person_source_value, person_id) %>% select(person_source_value, person_id)
-  augmented_data<-raw_data %>%
+  augmented_data<-combined_dataset %>%
       left_join(employee_id_mapping, by=c("eessno"="person_source_value")) %>%
       left_join(empstats_mapping, by="empstats") %>%
       left_join(emptype_mapping, by="emptype") %>%
       left_join(plant_mapping, by=c("locatcd"="work_site_source_value"))
 
   message("... testing the augmented data table")
-  original_size = nrow(raw_data)
+  original_size = nrow(combined_dataset)
   augmented_data_size = nrow(augmented_data)
   if (augmented_data_size == original_size) {
     message("... test PASSED - table join operation doesn't produce unexpected new data")
@@ -91,7 +102,7 @@ create_employment_record_table <- function(raw_data, person) {
   employment_record$employment_record_id<-seq.int(from=1, to=nrow(employment_record))
 
   message("... testing table join operation")
-  original_size = nrow(raw_data)
+  original_size = nrow(combined_dataset)
   employment_record_size = nrow(employment_record)
   if (employment_record_size == original_size) {
     message("... test PASSED - table join operation doesn't produce unexpected new data")
@@ -103,7 +114,7 @@ create_employment_record_table <- function(raw_data, person) {
   message("... collecting ", formatC(dataset_size, format="d", big.mark=","), " rows in ", length(names(employment_record)), " variables")
 
   message("... testing data size")
-  expected_size = 3052017
+  expected_size = 3032114
   if (dataset_size == expected_size) {
     message("... test PASSED - the resulting data size meets the expected number")
   } else {
