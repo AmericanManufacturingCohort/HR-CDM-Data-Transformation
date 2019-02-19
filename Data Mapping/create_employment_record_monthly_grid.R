@@ -1,4 +1,5 @@
 create_employment_record_monthly_grid <- function(employment_record) {
+  options(scipen=999)  # Prevents representing large numbers in scientific notation
   if (!("dplyr" %in% (.packages()))) {
     library(dplyr)    
   }

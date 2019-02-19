@@ -1,4 +1,5 @@
 create_work_site_table <- function() {
+  options(scipen=999)  # Prevents representing large numbers in scientific notation
   if (!("dplyr" %in% (.packages()))) {
     library(dplyr)    
   }

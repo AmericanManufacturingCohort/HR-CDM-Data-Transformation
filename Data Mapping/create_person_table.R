@@ -1,4 +1,5 @@
 create_person_table <- function(combined_dataset) {
+  options(scipen=999)  # Prevents representing large numbers in scientific notation
   if (!("dplyr" %in% (.packages()))) {
     library(dplyr)    
   }

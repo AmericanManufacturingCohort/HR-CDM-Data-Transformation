@@ -1,4 +1,5 @@
 create_hr_event_table <- function(combined_dataset, person) {
+  options(scipen=999)  # Prevents representing large numbers in scientific notation
   if (!("dplyr" %in% (.packages()))) {
     library(dplyr)    
   }

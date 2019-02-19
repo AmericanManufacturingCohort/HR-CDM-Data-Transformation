@@ -1,4 +1,5 @@
 create_hrcdm_tables <- function(combined_dataset_filepath, retirement_eligibility_dataset_filepath, output_dir="/tmp") {
+  options(scipen=999)  # Prevents representing large numbers in scientific notation
   if (!("dplyr" %in% (.packages()))) {
     library(dplyr)    
   }

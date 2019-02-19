@@ -1,4 +1,5 @@
 create_employee_table <- function(combined_dataset, person, employment_record) {
+  options(scipen=999)  # Prevents representing large numbers in scientific notation
   if (!("dplyr" %in% (.packages()))) {
     library(dplyr)    
   }
