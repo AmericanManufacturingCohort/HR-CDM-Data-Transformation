@@ -65,7 +65,7 @@ create_harmonized_peoplesoft_dataset <- function(df, filename) {
   message("... collecting ", formatC(dataset_size, format="d", big.mark=","), " rows in ", length(names(pv_dataset)), " variables")
    
   message("... testing data size")
-  expected_size = 2437989
+  expected_size = 2438371
   if (dataset_size == expected_size) {
     message("... test PASSED - the resulting data size meets the expected number")
   } else {

@@ -17,7 +17,7 @@ create_combined_dataset <- function(pv_filepath, pv_filename, oracle_filepath, o
   dataset_size = nrow(combined_dataset)
   message("... collecting ", formatC(dataset_size, format="d", big.mark=","), " rows in ", length(names(combined_dataset)), " variables")
   message("... testing data size")
-  expected_size = 3052017
+  expected_size = 3165244
   if (dataset_size == expected_size) {
     message("... test PASSED - the resulting data size meets the expected number")
   } else {

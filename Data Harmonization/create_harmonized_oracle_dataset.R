@@ -70,7 +70,7 @@ create_harmonized_oracle_dataset <- function(df, filename) {
   message("... collecting ", formatC(dataset_size, format="d", big.mark=","), " rows in ", length(names(oracle_dataset)), " variables")
 
   message("... testing data size")
-  expected_size = 614028
+  expected_size = 726873
   if (dataset_size == expected_size) {
     message("... test PASSED - the resulting data size meets the expected number")
   } else {
