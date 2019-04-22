@@ -7,9 +7,18 @@ create_harmonized_peoplesoft_dataset <- function(df) {
   }
   
   message("Processing PeopleSoft dataset")
-  pv_dataset <- df
+  message("... preparing variables")
   pv_variables <- names(pv_dataset)
   names(pv_dataset) <- tolower(pv_variables)
+
+  message("... sorting raw data based on {eessno, effdtdt}")
+  pv_dataset <- df %>%
+      mutate_if(is.factor, as.character) %>%
+      arrange(eessno, effdtdt)
+
+  message("... generating row id")
+  pv_dataset$row_id <- paste0("PV.HR_", seq.int(from=1, to=nrow(df)))
+
   message("... extracting data")
   pv_dataset <- pv_dataset %>%
       mutate_if(is.factor, as.character) %>%
@@ -42,13 +51,13 @@ create_harmonized_peoplesoft_dataset <- function(df) {
              first_risk_score=ifelse(!is.na(as.numeric(first_risk_score)), as.numeric(first_risk_score), NA),
              risk_score_year=ifelse(!is.na(as.numeric(risk_score_year)), as.numeric(risk_score_year), NA),
              source="PV") %>%
-      select(eessno, ethnicde, sex, dobdt, hiredt,
+      select(row_id, eessno, ethnicde, sex, dobdt, hiredt,
              termdt, deathdt, effdtdt, actioncd, action,
              actionde, reasoncd, locatcd, locatdes, empstats,
              emptype, jobfamily, jobtitle, jobcode, deptname,
              deptcode, buname, bucode, paygroup, comprate,
-             annual, first_risk_score, risk_score_year, source) %>%
-      arrange(eessno,effdtdt)
+             annual, first_risk_score, risk_score_year, source)
+
   message("... removing duplicates")
   pv_dataset <- unique(pv_dataset)
   dataset_size = nrow(pv_dataset)

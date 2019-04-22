@@ -7,11 +7,20 @@ create_harmonized_oracle_dataset <- function(df) {
   }
   
   message("Processing Oracle dataset")
-  oracle_dataset <- df
+  message("... preparing variables")
   oracle_variables <- names(oracle_dataset)
   names(oracle_dataset) <- tolower(oracle_variables)
   oracle_dataset <- separate(oracle_dataset, deptcode, " ", into=c("deptcode_cd", "deptcode_des"), remove=F)
   oracle_dataset <- separate(oracle_dataset, paygrdes, " ", into=c("paygrdes_cd", "paygrdes_des"), remove=F)
+
+  message("... sorting raw data based on {eessno, effdtdt}")
+  oracle_dataset <- df %>%
+      mutate_if(is.factor, as.character) %>%
+      arrange(eessno, effdtdt)
+
+  message("... generating row id")
+  oracle_dataset$row_id <- paste0("OR.HR_", seq.int(from=1, to=nrow(df)))
+
   message("... extracting data")
   oracle_dataset <- oracle_dataset %>%
       mutate_if(is.factor, as.character) %>%
@@ -44,13 +53,13 @@ create_harmonized_oracle_dataset <- function(df) {
              first_risk_score=ifelse(!is.na(as.numeric(first_risk_score)), as.numeric(first_risk_score), NA),
              risk_score_year=ifelse(!is.na(as.numeric(risk_score_year)), as.numeric(risk_score_year), NA),
              source="OR") %>%
-      select(eessno, ethnicde, sex, dobdt, hiredt,
+      select(row_id, eessno, ethnicde, sex, dobdt, hiredt,
              termdt, deathdt, effdtdt, actioncd, action,
              actionde, reasoncd, locatcd, locatdes, empstats,
              emptype, jobfamily, jobtitle, jobcode, deptname,
              deptcode, buname, bucode, paygroup, comprate,
-             annual, first_risk_score, risk_score_year, source) %>%
-      arrange(eessno,effdtdt)
+             annual, first_risk_score, risk_score_year, source)
+
   message("... removing duplicates")
   oracle_dataset <- unique(oracle_dataset)
   dataset_size = nrow(oracle_dataset)
