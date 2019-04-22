@@ -1,17 +1,20 @@
-create_harmonized_oracle_dataset <- function(df) {
+create_harmonized_oracle_dataset <- function(df, filename) {
   if (!("dplyr" %in% (.packages()))) {
     library(dplyr)    
   }
   if (!("lubridate" %in% (.packages()))) {
     library(lubridate)    
   }
-  
+  if (!("tidyr" %in% (.packages()))) {
+    library(tidyr)    
+  }
+
   message("Processing Oracle dataset")
   message("... preparing variables")
-  oracle_variables <- names(oracle_dataset)
-  names(oracle_dataset) <- tolower(oracle_variables)
-  oracle_dataset <- separate(oracle_dataset, deptcode, " ", into=c("deptcode_cd", "deptcode_des"), remove=F)
-  oracle_dataset <- separate(oracle_dataset, paygrdes, " ", into=c("paygrdes_cd", "paygrdes_des"), remove=F)
+  oracle_variables <- names(df)
+  names(df) <- tolower(oracle_variables)
+  df <- separate(df, deptcode, " ", into=c("deptcode_cd", "deptcode_des"), remove=F)
+  df <- separate(df, paygrdes, " ", into=c("paygrdes_cd", "paygrdes_des"), remove=F)
 
   message("... sorting raw data based on {eessno, effdtdt}")
   oracle_dataset <- df %>%
@@ -23,14 +26,13 @@ create_harmonized_oracle_dataset <- function(df) {
 
   message("... extracting data")
   oracle_dataset <- oracle_dataset %>%
-      mutate_if(is.factor, as.character) %>%
       mutate(eessno=eessno,
              ethnicde=ifelse(ethnicde=="",NA,ethnicde),
              sex=ifelse(sex=="",NA,ifelse(sex=="Male","M",ifelse(sex=="Female","F",sex))),
              dobdt=as.Date(dobdt,format = "%m/%d/%Y"),
              hiredt=as.Date(hiredt,format = "%m/%d/%Y"),
              termdt=as.Date(termdt,format = "%m/%d/%Y"),
-	           deathdt=as.Date(date_of_death,format = "%m/%d/%Y"),
+             deathdt=as.Date(date_of_death,format = "%m/%d/%Y"),
              effdtdt=as.Date(effdtdt,format = "%m/%d/%Y"),
              actioncd=NA,
              action=ifelse(action=="",NA,action),
@@ -52,16 +54,18 @@ create_harmonized_oracle_dataset <- function(df) {
              annual=ifelse(!is.na(as.numeric(annual)), round(as.numeric(annual), digits=2), NA),
              first_risk_score=ifelse(!is.na(as.numeric(first_risk_score)), as.numeric(first_risk_score), NA),
              risk_score_year=ifelse(!is.na(as.numeric(risk_score_year)), as.numeric(risk_score_year), NA),
+             table_id=filename,
              source="OR") %>%
       select(row_id, eessno, ethnicde, sex, dobdt, hiredt,
              termdt, deathdt, effdtdt, actioncd, action,
              actionde, reasoncd, locatcd, locatdes, empstats,
              emptype, jobfamily, jobtitle, jobcode, deptname,
              deptcode, buname, bucode, paygroup, comprate,
-             annual, first_risk_score, risk_score_year, source)
+             annual, first_risk_score, risk_score_year, table_id,
+             source)
 
   message("... removing duplicates")
-  oracle_dataset <- unique(oracle_dataset)
+  oracle_dataset <- oracle_dataset[!duplicated(oracle_dataset[c(1:30)]),]  # except 0=row_id
   dataset_size = nrow(oracle_dataset)
   message("... collecting ", formatC(dataset_size, format="d", big.mark=","), " rows in ", length(names(oracle_dataset)), " variables")
 

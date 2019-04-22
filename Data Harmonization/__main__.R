@@ -1,8 +1,8 @@
-create_combined_dataset <- function(pv_filepath, oracle_filepath, output_dir="/tmp") {
+create_combined_dataset <- function(pv_filepath, pv_filename, oracle_filepath, oracle_filename, output_dir="/tmp") {
   source("create_harmonized_peoplesoft_dataset.R")
   source("create_harmonized_oracle_dataset.R")
-  pv_dataset <- create_harmonized_peoplesoft_dataset(read_csv(pv_filepath))
-  oracle_dataset <- create_harmonized_oracle_dataset(read_csv(oracle_filepath))
+  pv_dataset <- create_harmonized_peoplesoft_dataset(read_csv(pv_filepath), pv_filename)
+  oracle_dataset <- create_harmonized_oracle_dataset(read_csv(oracle_filepath), oracle_filename)
   if ("dplyr" %in% (.packages())) {
     detach(package:dplyr)
   }
@@ -10,13 +10,12 @@ create_combined_dataset <- function(pv_filepath, oracle_filepath, output_dir="/t
   message("Combining datasets")
   message("... merging datasets")
   combined_dataset <- rbind.fill(pv_dataset, oracle_dataset)
+  detach(package:plyr)
+  
   message("... removing duplicates")
   combined_dataset <- unique(combined_dataset)
-  detach(package:plyr)
   dataset_size = nrow(combined_dataset)
   message("... collecting ", formatC(dataset_size, format="d", big.mark=","), " rows in ", length(names(combined_dataset)), " variables")
-  detach(package:plyr)
-
   message("... testing data size")
   expected_size = 3052017
   if (dataset_size == expected_size) {
@@ -30,7 +29,7 @@ create_combined_dataset <- function(pv_filepath, oracle_filepath, output_dir="/t
 
 read_csv <- function(filepath) {
   message("... reading CSV data from ", filepath)
-  df = read.csv2(filepath, sep="|", quote="")
+  df = read.csv2(filepath, sep="|", quote="", na.strings=c("NA", "NaN", "n/a", "", " "))
   return (df)
 }
 

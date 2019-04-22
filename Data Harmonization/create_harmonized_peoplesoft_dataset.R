@@ -1,4 +1,4 @@
-create_harmonized_peoplesoft_dataset <- function(df) {
+create_harmonized_peoplesoft_dataset <- function(df, filename) {
   if (!("dplyr" %in% (.packages()))) {
     library(dplyr)    
   }
@@ -8,8 +8,8 @@ create_harmonized_peoplesoft_dataset <- function(df) {
   
   message("Processing PeopleSoft dataset")
   message("... preparing variables")
-  pv_variables <- names(pv_dataset)
-  names(pv_dataset) <- tolower(pv_variables)
+  pv_variables <- names(df)
+  names(df) <- tolower(pv_variables)
 
   message("... sorting raw data based on {eessno, effdtdt}")
   pv_dataset <- df %>%
@@ -21,14 +21,13 @@ create_harmonized_peoplesoft_dataset <- function(df) {
 
   message("... extracting data")
   pv_dataset <- pv_dataset %>%
-      mutate_if(is.factor, as.character) %>%
       mutate(eessno=eessno,
              ethnicde=ifelse(ethnicde=="",NA,ethnicde),
              sex=ifelse(sex=="",NA,sex),
              dobdt=as.Date(dobdt,format = "%m/%d/%Y"),
              hiredt=as.Date(hiredt,format = "%m/%d/%Y"),
              termdt=as.Date(termdt,format = "%m/%d/%Y"),
-	           deathdt=as.Date(date_of_death,format = "%m/%d/%Y"),
+             deathdt=as.Date(date_of_death,format = "%m/%d/%Y"),
              effdtdt=as.Date(effdtdt,format = "%m/%d/%Y"),
              actioncd=ifelse(actioncd=="",NA,actioncd),
              action=ifelse(actionde=="",NA,actionde),
@@ -50,16 +49,18 @@ create_harmonized_peoplesoft_dataset <- function(df) {
              annual=ifelse(!is.na(as.numeric(annual)), round(as.numeric(annual), digits=2), NA),
              first_risk_score=ifelse(!is.na(as.numeric(first_risk_score)), as.numeric(first_risk_score), NA),
              risk_score_year=ifelse(!is.na(as.numeric(risk_score_year)), as.numeric(risk_score_year), NA),
+             table_id=filename,
              source="PV") %>%
       select(row_id, eessno, ethnicde, sex, dobdt, hiredt,
              termdt, deathdt, effdtdt, actioncd, action,
              actionde, reasoncd, locatcd, locatdes, empstats,
              emptype, jobfamily, jobtitle, jobcode, deptname,
              deptcode, buname, bucode, paygroup, comprate,
-             annual, first_risk_score, risk_score_year, source)
+             annual, first_risk_score, risk_score_year, table_id,
+             source)
 
   message("... removing duplicates")
-  pv_dataset <- unique(pv_dataset)
+  pv_dataset <- pv_dataset[!duplicated(pv_dataset[c(1:30)]),]  # except 0=row_id
   dataset_size = nrow(pv_dataset)
   message("... collecting ", formatC(dataset_size, format="d", big.mark=","), " rows in ", length(names(pv_dataset)), " variables")
    
